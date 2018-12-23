@@ -67,6 +67,9 @@
                 </el-tag>
               </div>
             </div>
+            <div class="lottery-detail-basic-text-item" v-if="lottery.unit.length>0">
+              <span class="lottery-detail-basic-text-invalid">*红色为无效规格</span>
+            </div>
             <div class="lottery-detail-basic-text-item lottery-detail-botton">
               <el-button size="small" @click="showView('list')">返回</el-button>
               <el-button size="small" type="danger" @click="showView('edit')">编辑</el-button>
@@ -77,15 +80,53 @@
     </div>
 
     <div v-if="show=='edit' || show=='add'">
+      <el-row class="goods-form-area">
+        <el-col :span="12">
+          <el-form ref="lotteryForm" :model="lottery" :rules="lotteryRules" label-width="100px">
+            <el-form-item label="活动图片" prop="product.icon">
+              <el-upload
+                :multiple="false"
+                :limit="1"
+                :file-list="fileList"
+                :on-remove="handleImageRemove"
+                :on-success="handleImageSuccess"
+                :before-upload="beforeImageUpload"
+                class="editor-slide-upload"
+                :action="service+'/fileupload/multiUpload'"
+                list-type="picture-card">
+                <el-button size="small" type="primary">点击上传</el-button>
+              </el-upload>
+            </el-form-item>
+            <el-form-item label="活动名称" prop="product.name">
+              <el-input :placeholder="$t('lottery.name')" v-model="lottery.product.name"/>
+            </el-form-item>
+            <el-form-item label="活动描述">
+              <el-input type="textarea" :autosize="{minRows: 6}" :placeholder="$t('lottery.description')" v-model="lottery.product.description"/>
+            </el-form-item>
+            <el-form-item label="活动规格" prop="unit">
+              <div class="unit-box" v-for="(item, index) in lottery.unit" :key="index">
 
+              </div>
+              <div class="unit-box">
+                <el-input :placeholder="$t('lottery.unitName')" v-model="lottery.noneUnit.name"/>
+              </div>
+            </el-form-item>
+            <el-form-item>
+              <el-button size="small" @click="showView('list')">取消</el-button>
+              <el-button size="small" type="primary" @click="handleSubmit">保存</el-button>
+            </el-form-item>
+          </el-form>
+        </el-col>
+      </el-row>
     </div>
   </div>
 </template>
 
 <script>
-import { fetchList, fetchProduct, removeProduct } from '@/api/lottery'
+import { fetchList, fetchProduct, removeProduct, createProduct, updateProduct, createUnit, removeUnit } from '@/api/lottery'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import waves from '@/directive/waves'
+import { Promise } from 'q';
 
 export default {
   name: 'ProductList',
@@ -104,15 +145,34 @@ export default {
       listQuery: {
         pagenum: 1,
         pagesize: 10,
-        name: '',
-        isvalid: ''
+        name: undefined,
+        isvalid: undefined
       },
       lottery: {
         product: {},
-        unit: []
+        unit: [],
+        noneUnit: {}
       },
 
-      show: 'list'
+      show: 'list',
+
+      fileList: [],
+
+      lotteryRules: {
+        product: {
+          name: [
+            {required: true, message: '请输入活动名称', trigger: 'blur'}
+          ],
+          icon: [
+            {required: true, message: '请上传活动图片', trigger: 'change'}
+          ]
+        },
+        unit: [
+          { type: 'array', required: true, message: '请至少添加一个活动规格', trigger: 'change' }
+        ]
+      },
+
+      service: process.env.BASE_API
     }
   },
   created() {
@@ -141,6 +201,11 @@ export default {
       fetchProduct(row.id).then(response => {
         if(response.code==0){
           this.lottery = response.data
+          this.fileList = []
+          if(this.lottery.product.icon!=null && this.lottery.product.icon!=''){
+            this.fileList.push({name: this.lottery.product.name, url: this.lottery.product.icon})
+          }
+          this.lottery.noneUnit = {}
           this.showView('detail')
         }
       })
@@ -149,6 +214,11 @@ export default {
       fetchProduct(row.id).then(response => {
         if(response.code==0){
           this.lottery = response.data
+          this.fileList = []
+          if(this.lottery.product.icon!=null && this.lottery.product.icon!=''){
+            this.fileList.push({name: this.lottery.product.name, url: this.lottery.product.icon})
+          }
+          this.lottery.noneUnit = {}
           this.showView('edit')
         }
       })
@@ -171,9 +241,90 @@ export default {
     handleCreate(){
       this.lottery = {
         product: {},
-        unit: []
+        unit: [],
+        noneUnit: {}
       }
+      this.fileList = []
       this.showView('add')
+    },
+    handleImageRemove(file, fileList) {
+      this.lottery.product.icon = ''
+    },
+    handleImageSuccess(response, file, fileList) {
+      if(response.code==200){
+        this.lottery.product.icon = response.data[0]
+      }
+    },
+    beforeImageUpload(file) {
+
+    },
+    handleSubmit() {
+      if(this.show == 'add'){
+        createProduct(this.lottery.product).then(response=>{
+          if(response.code==0){
+            let productid = response.data
+            if(this.lottery.unit.length>0){
+              let unitList = []
+              this.lottery.unit.forEach(item=>{
+                item.productid = productid
+                unitList.push(new Promise((resolve, reject)=>{
+                  createUnit(item).then(res=>{
+                    if(res.code==0){
+                      resolve()
+                    }else{
+                      reject(res.msg)
+                    }
+                  })
+                }))
+              })
+              Promise.all(unitList).then(r=>{
+                this.$message.success('保存成功')
+              },error=>{
+                this.$message.error(error)
+              })
+            }else{
+              this.$message.success('保存成功')
+            }
+          }else{
+            this.$message.error(response.msg)
+          }
+        })
+      }else if(this.show == 'edit'){
+        updateProduct(this.lottery.product).then(response=>{
+          if(response.code==0){
+            if(this.lottery.unit.length>0){
+              let unitList = []
+              this.lottery.unit.forEach(item=>{
+                if(item.id==undefined || item.id==null || item.id==''){
+                  item.productid = this.lottery.product.id
+                  unitList.push(new Promise((resolve, reject)=>{
+                    createUnit(item).then(res=>{
+                      if(res.code==0){
+                        resolve()
+                      }else{
+                        reject(res.msg)
+                      }
+                    })
+                  }))
+                }
+              })
+              if(unitList.length>0){
+                Promise.all(unitList).then(r=>{
+                  this.$message.success('保存成功')
+                },error=>{
+                  this.$message.error(error)
+                })
+              }else{
+                this.$message.success('保存成功')
+              }
+            }else{
+              this.$message.success('保存成功')
+            }
+          }else{
+            this.$message.error(response.msg)
+          }
+        })
+      }
     }
   }
 }
@@ -197,8 +348,12 @@ export default {
   .lottery-detail-basic-box{
     display: flex;
     .lottery-detail-basic-image{
-      width: 400px;
-      height: 400px;
+      width: 300px;
+      flex-shrink: 0;
+      img{
+        width: 100%;
+        max-width: 100%;
+      }
     }
     .lottery-detail-basic-text{
       flex-grow: 1;
@@ -216,6 +371,15 @@ export default {
       }
       .lottery-detail-basic-text-description{
         margin-top: 15px;
+        background: #eef1f6;
+        padding: 15px 16px;
+        line-height: 36px;
+        font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+        display: block;
+      }
+      .lottery-detail-basic-text-invalid{
+        color: #F40;
+        font-size: 8px;
       }
     }
   }
