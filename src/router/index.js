@@ -77,6 +77,18 @@ export const constantRouterMap = [{
         }]
     },
     {
+        path: '/lottery',
+        component: Layout,
+        redirect: '/lottery/list',
+        children: [{
+            path: 'list',
+            component: () =>
+                import ('@/views/lottery/list'),
+            name: 'Lottery',
+            meta: { title: 'lottery', icon: 'guide', noCache: true }
+        }]
+    },
+    {
         path: '/documentation',
         component: Layout,
         redirect: '/documentation/index',

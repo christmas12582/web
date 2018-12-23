@@ -1,6 +1,7 @@
 export default {
   route: {
-    dashboard: '活动',
+	dashboard: '首页',
+    lottery: '活动',
     introduction: '简述',
     documentation: '文档',
     guide: '引导页',
@@ -152,5 +153,9 @@ export default {
     close: '关闭',
     closeOthers: '关闭其它',
     closeAll: '关闭所有'
+  },
+  lottery: {
+    name: '请输入活动名称',
+    isvalid: '请选择活动是否有效'
   }
 }
