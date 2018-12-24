@@ -124,9 +124,9 @@
               </div>
               <div class="unit-box">
                 <el-row>
-                  <el-col :span="7"><el-input :placeholder="$t('lottery.unitName')" v-model="lottery.noneUnit.name"/></el-col>
-                  <el-col :span="6" :offset="1"><el-input :placeholder="$t('lottery.unitPrice')" v-model="lottery.noneUnit.price"><template slot="append">元</template></el-input></el-col>
-                  <el-col :span="6" :offset="1"><el-input :placeholder="$t('lottery.unitExpired')" v-model="lottery.noneUnit.expired"><template slot="append">月</template></el-input></el-col>
+                  <el-col :span="7"><el-input :placeholder="$t('lottery.unitName')" v-model="noneUnit.name"/></el-col>
+                  <el-col :span="6" :offset="1"><el-input :placeholder="$t('lottery.unitPrice')" v-model="noneUnit.price"><template slot="append">元</template></el-input></el-col>
+                  <el-col :span="6" :offset="1"><el-input :placeholder="$t('lottery.unitExpired')" v-model="noneUnit.expired"><template slot="append">月</template></el-input></el-col>
                   <el-col :span="3" style="text-align: right"><el-button type="primary" size="mini" @click="handleAddUnit">添加</el-button></el-col>
                 </el-row>
               </div>
@@ -170,9 +170,10 @@ export default {
       },
       lottery: {
         product: {},
-        unit: [],
-        noneUnit: {}
+        unit: []
       },
+
+      noneUnit: {},
 
       show: 'list',
 
@@ -225,7 +226,7 @@ export default {
           if(this.lottery.product.icon!=null && this.lottery.product.icon!=''){
             this.fileList.push({name: this.lottery.product.name, url: this.lottery.product.icon})
           }
-          this.lottery.noneUnit = {}
+          this.noneUnit = {}
           this.showView('detail')
         }
       })
@@ -238,7 +239,7 @@ export default {
           if(this.lottery.product.icon!=null && this.lottery.product.icon!=''){
             this.fileList.push({name: this.lottery.product.name, url: this.lottery.product.icon})
           }
-          this.lottery.noneUnit = {}
+          this.noneUnit = {}
           this.showView('edit')
         }
       })
@@ -263,9 +264,9 @@ export default {
         product: {
           isvalid: 1
         },
-        unit: [],
-        noneUnit: {}
+        unit: []
       }
+      this.noneUnit = {},
       this.fileList = []
       this.showView('add')
     },
@@ -380,25 +381,27 @@ export default {
       }
     },
     handleAddUnit() {
-      if(this.lottery.noneUnit.name==undefined || this.lottery.noneUnit.name==''){
+      if(this.noneUnit.name==undefined || this.noneUnit.name==''){
         this.$message.error('请输入规格名称')
         return false
       }
-      if(this.lottery.noneUnit.price==undefined || this.lottery.noneUnit.price==''){
+      if(this.noneUnit.price==undefined || this.noneUnit.price==''){
         this.$message.error('请输入规格价格')
         return false
       }
-      if(this.lottery.noneUnit.expired==undefined || this.lottery.noneUnit.expired==''){
+      if(this.noneUnit.expired==undefined || this.noneUnit.expired==''){
         this.$message.error('请输入规格期限')
         return false
       }
       let unit = {}
-      unit.name = this.lottery.noneUnit.name
+      unit.name = this.noneUnit.name
       unit.isvalid = 1
-      unit.price = this.lottery.noneUnit.price * 100
-      unit.expired = this.lottery.noneUnit.expired
+      unit.price = this.noneUnit.price * 100
+      unit.expired = this.noneUnit.expired
       this.lottery.unit.push(unit)
-      this.lottery.noneUnit = {}
+      this.noneUnit.name = ''
+      this.noneUnit.price = ''
+      this.noneUnit.expired = ''
     },
     handleUnitStatus(unit) {
       if(unit.id!=undefined && unit.id!=null && unit.id!=''){
