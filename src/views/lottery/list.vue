@@ -59,7 +59,7 @@
             <div class="lottery-detail-basic-text-item">
               <span class="lottery-detail-basic-text-description">描述：{{lottery.product.description?lottery.product.description:'无'}}</span>
             </div>
-            <div class="lottery-detail-basic-text-item lottery-detail-unit-box">
+            <div class="lottery-detail-basic-text-item lottery-detail-unit-box" v-if="lottery.unit.length>0">
               <div class="lottery-detail-unit" v-for="item in lottery.unit" :key="item.id">
                 <el-tag :type="item.isvalid==1?'success':'danger'">
                   <div class="lottery-detail-unit-item lottery-detail-unit-name">{{item.name}}</div>
@@ -71,8 +71,8 @@
               <span class="lottery-detail-basic-text-invalid">*红色为无效规格</span>
             </div>
             <div class="lottery-detail-basic-text-item lottery-detail-botton">
-              <el-button size="small" @click="showView('list')">返回</el-button>
               <el-button size="small" type="danger" @click="showView('edit')">编辑</el-button>
+              <el-button size="small" @click="showView('list')">返回</el-button>
             </div>
           </div>
         </div>
@@ -81,7 +81,7 @@
 
     <div v-if="show=='edit' || show=='add'">
       <el-row class="goods-form-area">
-        <el-col :span="12">
+        <el-col :span="16">
           <el-form ref="lotteryForm" :model="lottery" :rules="lotteryRules" label-width="100px">
             <el-form-item label="活动图片" prop="product.icon">
               <el-upload
@@ -100,20 +100,40 @@
             <el-form-item label="活动名称" prop="product.name">
               <el-input :placeholder="$t('lottery.name')" v-model="lottery.product.name"/>
             </el-form-item>
+            <el-form-item label="是否有效">
+              <el-switch
+                v-model="lottery.product.isvalid"
+                :active-value="1"
+                :inactive-value="0"
+                active-text="是"
+                inactive-text="否">
+              </el-switch>
+            </el-form-item>
             <el-form-item label="活动描述">
               <el-input type="textarea" :autosize="{minRows: 6}" :placeholder="$t('lottery.description')" v-model="lottery.product.description"/>
             </el-form-item>
             <el-form-item label="活动规格" prop="unit">
               <div class="unit-box" v-for="(item, index) in lottery.unit" :key="index">
-
+                <el-row>
+                  <el-col :span="8">{{item.name}}</el-col>
+                  <el-col :span="7">￥{{item.price/100}}</el-col>
+                  <el-col :span="4">{{item.expired}}个月</el-col>
+                  <el-col :span="2"><el-switch v-model="item.isvalid" :active-value="1" :inactive-value="0" @change="handleUnitStatus(item)"></el-switch></el-col>
+                  <el-col :span="3" style="text-align: right"><el-button type="danger" size="mini" @click="handleRemoveUnit(index)">删除</el-button></el-col>
+                </el-row>
               </div>
               <div class="unit-box">
-                <el-input :placeholder="$t('lottery.unitName')" v-model="lottery.noneUnit.name"/>
+                <el-row>
+                  <el-col :span="7"><el-input :placeholder="$t('lottery.unitName')" v-model="lottery.noneUnit.name"/></el-col>
+                  <el-col :span="6" :offset="1"><el-input :placeholder="$t('lottery.unitPrice')" v-model="lottery.noneUnit.price"><template slot="append">元</template></el-input></el-col>
+                  <el-col :span="6" :offset="1"><el-input :placeholder="$t('lottery.unitExpired')" v-model="lottery.noneUnit.expired"><template slot="append">月</template></el-input></el-col>
+                  <el-col :span="3" style="text-align: right"><el-button type="primary" size="mini" @click="handleAddUnit">添加</el-button></el-col>
+                </el-row>
               </div>
             </el-form-item>
             <el-form-item>
-              <el-button size="small" @click="showView('list')">取消</el-button>
               <el-button size="small" type="primary" @click="handleSubmit">保存</el-button>
+              <el-button size="small" @click="showView('list')">取消</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -123,7 +143,7 @@
 </template>
 
 <script>
-import { fetchList, fetchProduct, removeProduct, createProduct, updateProduct, createUnit, removeUnit } from '@/api/lottery'
+import { fetchList, fetchProduct, removeProduct, createProduct, updateProduct, createUnit, removeUnit, changeUnitStatus } from '@/api/lottery'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import waves from '@/directive/waves'
 import { Promise } from 'q';
@@ -183,8 +203,8 @@ export default {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         if(response.code==0){
-          this.list = response.data
-          this.total = 5
+          this.list = response.data.list
+          this.total = response.data.total
           this.listLoading = false
         }
       })
@@ -240,7 +260,9 @@ export default {
     },
     handleCreate(){
       this.lottery = {
-        product: {},
+        product: {
+          isvalid: 1
+        },
         unit: [],
         noneUnit: {}
       }
@@ -279,11 +301,15 @@ export default {
               })
               Promise.all(unitList).then(r=>{
                 this.$message.success('保存成功')
+                this.showView('list')
+                this.getList()
               },error=>{
                 this.$message.error(error)
               })
             }else{
               this.$message.success('保存成功')
+              this.showView('list')
+              this.getList()
             }
           }else{
             this.$message.error(response.msg)
@@ -311,17 +337,76 @@ export default {
               if(unitList.length>0){
                 Promise.all(unitList).then(r=>{
                   this.$message.success('保存成功')
+                  this.showView('list')
+                  this.getList()
                 },error=>{
                   this.$message.error(error)
                 })
               }else{
                 this.$message.success('保存成功')
+                this.showView('list')
+                this.getList()
               }
             }else{
               this.$message.success('保存成功')
+              this.showView('list')
+              this.getList()
             }
           }else{
             this.$message.error(response.msg)
+          }
+        })
+      }
+    },
+    handleRemoveUnit(index) {
+      if(index>=this.lottery.unit.length){
+        this.$message.success('规格不存在')
+      }
+      let unit = this.lottery.unit[index]
+      if(unit.id!=undefined && unit.id!=null && unit.id!=''){
+        this.$confirm('确认删除【'+unit.name+'】吗?', '提示', {type: 'warning'}).then(()=>{
+          removeUnit(unit.id).then(res=>{
+            if(res.code==0){
+              this.lottery.unit.splice(index,1)
+              this.$message.success('删除成功')
+            }else{
+              this.$message.error(res.msg)
+            }
+          })
+        }).catch(() => {})
+      }else{
+        this.lottery.unit.splice(index,1)
+        this.$message.success('删除成功')
+      }
+    },
+    handleAddUnit() {
+      if(this.lottery.noneUnit.name==undefined || this.lottery.noneUnit.name==''){
+        this.$message.error('请输入规格名称')
+        return false
+      }
+      if(this.lottery.noneUnit.price==undefined || this.lottery.noneUnit.price==''){
+        this.$message.error('请输入规格价格')
+        return false
+      }
+      if(this.lottery.noneUnit.expired==undefined || this.lottery.noneUnit.expired==''){
+        this.$message.error('请输入规格期限')
+        return false
+      }
+      let unit = {}
+      unit.name = this.lottery.noneUnit.name
+      unit.isvalid = 1
+      unit.price = this.lottery.noneUnit.price * 100
+      unit.expired = this.lottery.noneUnit.expired
+      this.lottery.unit.push(unit)
+      this.lottery.noneUnit = {}
+    },
+    handleUnitStatus(unit) {
+      if(unit.id!=undefined && unit.id!=null && unit.id!=''){
+        changeUnitStatus(unit.id, unit.isvalid).then(res=>{
+          if(res.code==0){
+            this.$message.success(unit.isvalid==0?'已变更为失效':'已变更为有效')
+          }else{
+            this.$message.error(res.msg)
           }
         })
       }
@@ -370,10 +455,10 @@ export default {
         color: #3C3C3C;
       }
       .lottery-detail-basic-text-description{
-        margin-top: 15px;
+        margin-top: 10px;
         background: #eef1f6;
         padding: 15px 16px;
-        line-height: 36px;
+        line-height: 30px;
         font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
         display: block;
       }
@@ -386,7 +471,7 @@ export default {
   .lottery-detail-unit-box{
     display: flex;
     flex-wrap: wrap;
-    margin-top: 20px;
+    margin-top: 10px;
     .lottery-detail-unit{
       padding: 10px 10px 10px 0;
       .lottery-detail-unit-item{
@@ -401,6 +486,6 @@ export default {
 }
 .lottery-detail-botton{
   width: 100%;
-  margin-top: 30px;
+  margin-top: 5px;
 }
 </style>

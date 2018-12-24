@@ -158,7 +158,8 @@ export default {
     name: '请输入活动名称',
     isvalid: '请选择活动是否有效',
 	description: '请输入活动描述',
-	unitName: '请输入活动规格名称',
-	unitPrice: '请输入活动规格价格(元)'
+	unitName: '规格名称',
+	unitPrice: '规格价格',
+	unitExpired: '规格期限'
   }
 }

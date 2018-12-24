@@ -64,3 +64,11 @@ export function removeUnit(id) {
         params: { id }
     })
 }
+
+export function changeUnitStatus(unitid, isvalid) {
+    return request({
+        url: '/operator/unitupdate',
+        method: 'post',
+        params: { unitid, isvalid }
+    })
+}
