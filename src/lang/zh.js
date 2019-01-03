@@ -3,6 +3,7 @@ export default {
 	dashboard: '首页',
     lottery: '活动',
 	distributor: '分销商',
+	cash: '提现',
     introduction: '简述',
     documentation: '文档',
     guide: '引导页',
@@ -168,5 +169,10 @@ export default {
 	  openid: '请输入分销商微信识别号',
 	  isvalid: '请选择分销商是否有效',
 	  ratio: '请输入分销商提成比例'
+  },
+  cash: {
+	  isexchange: '请选择提现状态',
+	  begintime: '请选择提现开始时间',
+	  endtime: '请选择提现结束时间'
   }
 }

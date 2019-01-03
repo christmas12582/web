@@ -87,6 +87,18 @@ export const constantRouterMap = [{
             name: 'Distributor',
             meta: { title: 'distributor', icon: 'guide', noCache: true }
         }]
+    },
+    {
+        path: '/cash',
+        component: Layout,
+        redirect: '/cash/list',
+        children: [{
+            path: 'list',
+            component: () =>
+                import ('@/views/cash/list'),
+            name: 'Cash',
+            meta: { title: 'cash', icon: 'documentation', noCache: true }
+        }]
     }//,
     // {
     //     path: '/documentation',

@@ -2,16 +2,16 @@ import request from '@/utils/request'
 
 export function fetchList(query) {
     return request({
-        url: '/operator/getdistributelist',
+        url: '/operator/cashlist',
         method: 'post',
         params: query
     })
 }
 
-export function changeRatio(userid, ratio) {
+export function offlineCash(cashid, isexchange) {
     return request({
-        url: '/operator/setratio',
+        url: '/operator/setcashexchange',
         method: 'post',
-        params: { userid, ratio }
+        params: { cashid, isexchange }
     })
 }
