@@ -2,6 +2,7 @@ export default {
   route: {
 	dashboard: '首页',
     lottery: '活动',
+	distributor: '分销商',
     introduction: '简述',
     documentation: '文档',
     guide: '引导页',
@@ -161,5 +162,10 @@ export default {
 	unitName: '规格名称',
 	unitPrice: '规格价格',
 	unitExpired: '规格期限'
+  },
+  distributor: {
+	  phone: '请输入分销商手机号',
+	  openid: '请输入分销商微信识别号',
+	  isvalid: '请选择分销商是否有效'
   }
 }
