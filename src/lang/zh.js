@@ -166,6 +166,7 @@ export default {
   distributor: {
 	  phone: '请输入分销商手机号',
 	  openid: '请输入分销商微信识别号',
-	  isvalid: '请选择分销商是否有效'
+	  isvalid: '请选择分销商是否有效',
+	  ratio: '请输入分销商提成比例'
   }
 }

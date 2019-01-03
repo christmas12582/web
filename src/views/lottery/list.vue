@@ -13,7 +13,7 @@
 
       <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
 
-        <el-table-column type="index" width="60" label="序号">
+        <el-table-column type="index" width="60" align="center" label="序号">
         </el-table-column>
 
         <el-table-column width="180" align="center" label="活动名称" show-overflow-tooltip>
@@ -282,82 +282,88 @@ export default {
 
     },
     handleSubmit() {
-      if(this.show == 'add'){
-        createProduct(this.lottery.product).then(response=>{
-          if(response.code==0){
-            let productid = response.data
-            if(this.lottery.unit.length>0){
-              let unitList = []
-              this.lottery.unit.forEach(item=>{
-                item.productid = productid
-                unitList.push(new Promise((resolve, reject)=>{
-                  createUnit(item).then(res=>{
-                    if(res.code==0){
-                      resolve()
-                    }else{
-                      reject(res.msg)
-                    }
+      this.$refs.lotteryForm.validate(valid => {
+        if(valid){
+          if(this.show == 'add'){
+            createProduct(this.lottery.product).then(response=>{
+              if(response.code==0){
+                let productid = response.data
+                if(this.lottery.unit.length>0){
+                  let unitList = []
+                  this.lottery.unit.forEach(item=>{
+                    item.productid = productid
+                    unitList.push(new Promise((resolve, reject)=>{
+                      createUnit(item).then(res=>{
+                        if(res.code==0){
+                          resolve()
+                        }else{
+                          reject(res.msg)
+                        }
+                      })
+                    }))
                   })
-                }))
-              })
-              Promise.all(unitList).then(r=>{
-                this.$message.success('保存成功')
-                this.showView('list')
-                this.getList()
-              },error=>{
-                this.$message.error(error)
-              })
-            }else{
-              this.$message.success('保存成功')
-              this.showView('list')
-              this.getList()
-            }
-          }else{
-            this.$message.error(response.msg)
-          }
-        })
-      }else if(this.show == 'edit'){
-        updateProduct(this.lottery.product).then(response=>{
-          if(response.code==0){
-            if(this.lottery.unit.length>0){
-              let unitList = []
-              this.lottery.unit.forEach(item=>{
-                if(item.id==undefined || item.id==null || item.id==''){
-                  item.productid = this.lottery.product.id
-                  unitList.push(new Promise((resolve, reject)=>{
-                    createUnit(item).then(res=>{
-                      if(res.code==0){
-                        resolve()
-                      }else{
-                        reject(res.msg)
-                      }
-                    })
-                  }))
-                }
-              })
-              if(unitList.length>0){
-                Promise.all(unitList).then(r=>{
+                  Promise.all(unitList).then(r=>{
+                    this.$message.success('保存成功')
+                    this.showView('list')
+                    this.getList()
+                  },error=>{
+                    this.$message.error(error)
+                  })
+                }else{
                   this.$message.success('保存成功')
                   this.showView('list')
                   this.getList()
-                },error=>{
-                  this.$message.error(error)
-                })
+                }
               }else{
-                this.$message.success('保存成功')
-                this.showView('list')
-                this.getList()
+                this.$message.error(response.msg)
               }
-            }else{
-              this.$message.success('保存成功')
-              this.showView('list')
-              this.getList()
-            }
-          }else{
-            this.$message.error(response.msg)
+            })
+          }else if(this.show == 'edit'){
+            updateProduct(this.lottery.product).then(response=>{
+              if(response.code==0){
+                if(this.lottery.unit.length>0){
+                  let unitList = []
+                  this.lottery.unit.forEach(item=>{
+                    if(item.id==undefined || item.id==null || item.id==''){
+                      item.productid = this.lottery.product.id
+                      unitList.push(new Promise((resolve, reject)=>{
+                        createUnit(item).then(res=>{
+                          if(res.code==0){
+                            resolve()
+                          }else{
+                            reject(res.msg)
+                          }
+                        })
+                      }))
+                    }
+                  })
+                  if(unitList.length>0){
+                    Promise.all(unitList).then(r=>{
+                      this.$message.success('保存成功')
+                      this.showView('list')
+                      this.getList()
+                    },error=>{
+                      this.$message.error(error)
+                    })
+                  }else{
+                    this.$message.success('保存成功')
+                    this.showView('list')
+                    this.getList()
+                  }
+                }else{
+                  this.$message.success('保存成功')
+                  this.showView('list')
+                  this.getList()
+                }
+              }else{
+                this.$message.error(response.msg)
+              }
+            })
           }
-        })
-      }
+        }else{
+          return false
+        }
+      })
     },
     handleRemoveUnit(index) {
       if(index>=this.lottery.unit.length){

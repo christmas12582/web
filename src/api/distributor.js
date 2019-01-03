@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function fetchList(query) {
     return request({
-        url: '/operator/productlist',
+        url: '/operator/getdistributelist',
         method: 'post',
         params: query
     })
@@ -65,10 +65,10 @@ export function removeUnit(id) {
     })
 }
 
-export function changeUnitStatus(unitid, isvalid) {
+export function changeRatio(userid, ratio) {
     return request({
-        url: '/operator/unitupdate',
+        url: '/operator/setratio',
         method: 'post',
-        params: { unitid, isvalid }
+        params: { userid, ratio }
     })
 }
