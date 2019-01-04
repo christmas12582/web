@@ -1,7 +1,7 @@
 export default {
   route: {
 	dashboard: '首页',
-    lottery: '活动',
+    lottery: '商品',
 	distributor: '分销商',
 	cash: '提现',
     introduction: '简述',
@@ -157,9 +157,9 @@ export default {
     closeAll: '关闭所有'
   },
   lottery: {
-    name: '请输入活动名称',
-    isvalid: '请选择活动是否有效',
-	description: '请输入活动描述',
+    name: '请输入商品名称',
+    isvalid: '请选择商品是否有效',
+	description: '请输入商品描述',
 	unitName: '规格名称',
 	unitPrice: '规格价格',
 	unitExpired: '规格期限'

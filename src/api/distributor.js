@@ -15,3 +15,11 @@ export function changeRatio(userid, ratio) {
         params: { userid, ratio }
     })
 }
+
+export function distributeDetail(query) {
+    return request({
+        url: '/distributor/mydistribute',
+        method: 'post',
+        params: query
+    })
+}

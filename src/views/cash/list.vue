@@ -50,7 +50,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column min-width="150" align="center" label="提现余额" show-overflow-tooltip>
+        <el-table-column min-width="150" align="center" label="提现金额(元)" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>￥{{ scope.row.money/100 }}</span>
           </template>

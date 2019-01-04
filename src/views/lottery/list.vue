@@ -16,7 +16,7 @@
         <el-table-column type="index" width="60" align="center" label="序号">
         </el-table-column>
 
-        <el-table-column width="180" align="center" label="活动名称" show-overflow-tooltip>
+        <el-table-column width="180" align="center" label="商品名称" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ scope.row.name }}</span>
           </template>
@@ -28,7 +28,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column min-width="300" align="center" label="活动描述" show-overflow-tooltip>
+        <el-table-column min-width="300" align="center" label="商品描述" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ scope.row.description }}</span>
           </template>
@@ -83,7 +83,7 @@
       <el-row class="goods-form-area">
         <el-col :span="16">
           <el-form ref="lotteryForm" :model="lottery" :rules="lotteryRules" label-width="100px">
-            <el-form-item label="活动图片" prop="product.icon">
+            <el-form-item label="商品图片" prop="product.icon">
               <el-upload
                 :multiple="false"
                 :limit="1"
@@ -97,7 +97,7 @@
                 <el-button size="small" type="primary">点击上传</el-button>
               </el-upload>
             </el-form-item>
-            <el-form-item label="活动名称" prop="product.name">
+            <el-form-item label="商品名称" prop="product.name">
               <el-input :placeholder="$t('lottery.name')" v-model="lottery.product.name"/>
             </el-form-item>
             <el-form-item label="是否有效">
@@ -109,10 +109,10 @@
                 inactive-text="否">
               </el-switch>
             </el-form-item>
-            <el-form-item label="活动描述">
+            <el-form-item label="商品描述">
               <el-input type="textarea" :autosize="{minRows: 6}" :placeholder="$t('lottery.description')" v-model="lottery.product.description"/>
             </el-form-item>
-            <el-form-item label="活动规格" prop="unit">
+            <el-form-item label="商品规格" prop="unit">
               <div class="unit-box" v-for="(item, index) in lottery.unit" :key="index">
                 <el-row>
                   <el-col :span="8">{{item.name}}</el-col>
@@ -182,14 +182,14 @@ export default {
       lotteryRules: {
         product: {
           name: [
-            {required: true, message: '请输入活动名称', trigger: 'blur'}
+            {required: true, message: '请输入商品名称', trigger: 'blur'}
           ],
           icon: [
-            {required: true, message: '请上传活动图片', trigger: 'change'}
+            {required: true, message: '请上传商品图片', trigger: 'change'}
           ]
         },
         unit: [
-          { type: 'array', required: true, message: '请至少添加一个活动规格', trigger: 'change' }
+          { type: 'array', required: true, message: '请至少添加一个商品规格', trigger: 'change' }
         ]
       },
 

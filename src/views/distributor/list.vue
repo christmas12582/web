@@ -40,7 +40,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column min-width="150" align="center" label="提成余额" show-overflow-tooltip>
+        <el-table-column min-width="150" align="center" label="提成余额(元)" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>￥{{ scope.row.money/100 }}</span>
           </template>
@@ -48,7 +48,7 @@
 
         <el-table-column min-width="300" label="操作">
           <template slot-scope="scope">
-            <el-button size="small" @click="handleDetail(scope.$index, scope.row)">查看分销记录</el-button>
+            <el-button size="small" @click="handleDetail(scope.$index, scope.row)">查看分销明细</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -68,24 +68,27 @@
       </el-dialog>
     </div>
     <div v-if="show=='detail'">
+      <div class="filter-container text">
+        <span>分销商：</span><span>{{detailListQuery.openid}}</span><el-button size="small" @click="showView('list')" class="cancel-btn">返回</el-button>
+      </div>
       <el-table v-loading="detailListLoading" :data="detailList" border fit highlight-current-row style="width: 100%">
 
         <el-table-column type="index" width="60" align="center" label="序号">
         </el-table-column>
 
-        <el-table-column width="240" align="center" label="订单号" show-overflow-tooltip>
+        <el-table-column min-width="240" align="center" label="订单号" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ scope.row.ordernum }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column width="150" align="center" label="活动名称" show-overflow-tooltip>
+        <el-table-column align="center" label="商品名称" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ scope.row.product.name }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column width="150" align="center" label="规格名称" show-overflow-tooltip>
+        <el-table-column align="center" label="规格名称" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ scope.row.unit.name }}</span>
           </template>
@@ -97,7 +100,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column min-width="150" align="center" label="支付金额" show-overflow-tooltip>
+        <el-table-column min-width="150" align="center" label="支付金额(元)" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>￥{{ scope.row.unit.price/100 }}</span>
           </template>
@@ -105,9 +108,7 @@
       </el-table>
 
       <pagination v-show="detailTotal>0" :total="detailTotal" :page.sync="detailListQuery.pagenum" :limit.sync="detailListQuery.pagesize" @pagination="morePage" />
-      <div class="btn-area">
-        <el-button size="small" @click="showView('list')" class="cancel-btn">返回</el-button>
-      </div>
+      
     </div>
   </div>
 </template>
@@ -256,12 +257,10 @@ export default {
 .edit-input {
   padding-right: 100px;
 }
-.btn-area {
-  position: absolute;
-  right: 20px;
+.text {
+  color: #909399;
 }
 .cancel-btn {
-  position: relative;
-  right: 20px;
+  margin-left: 20px;
 }
 </style>
