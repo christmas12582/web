@@ -26,7 +26,7 @@
         <el-table-column type="index" width="60" align="center" label="序号">
         </el-table-column>
 
-        <el-table-column width="240" align="center" label="openid" show-overflow-tooltip>
+        <el-table-column width="240" align="center" label="微信识别号" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ scope.row.openid }}</span>
           </template>
@@ -38,13 +38,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column class-name="status-col" label="是否有效" width="110">
+        <el-table-column class-name="status-col" label="提现状态" width="110">
           <template slot-scope="scope">
             <el-tag :type="scope.row.isexchange==1?'success':'danger'">{{ scope.row.isexchange==1?'已完成':'待处理' }}</el-tag>
           </template>
         </el-table-column>
 
-        <el-table-column min-width="120" align="center" label="申请时间" show-overflow-tooltip>
+        <el-table-column min-width="180" align="center" label="申请时间" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ scope.row.createtime }}</span>
           </template>
@@ -56,7 +56,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column min-width="300" label="操作">
+        <el-table-column min-width="250" label="操作">
           <template slot-scope="scope">
             <el-button size="small" type="danger" @click="handleOffLinePay(scope.$index, scope.row)">已线下支付</el-button>
           </template>

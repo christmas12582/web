@@ -16,7 +16,7 @@
         <el-table-column type="index" width="60" align="center" label="序号">
         </el-table-column>
 
-        <el-table-column width="240" align="center" label="openid" show-overflow-tooltip>
+        <el-table-column width="240" align="center" label="微信识别号" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ scope.row.openid }}</span>
           </template>
@@ -48,9 +48,7 @@
 
         <el-table-column min-width="300" label="操作">
           <template slot-scope="scope">
-            <el-button size="small" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
-            <el-button size="small" @click="handleUpdate(scope.$index, scope.row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="handleRemove(scope.$index, scope.row)">删除</el-button>
+            <el-button size="small" @click="handleDetail(scope.$index, scope.row)">查看分销记录</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -69,14 +67,53 @@
         </el-form>
       </el-dialog>
     </div>
+    <div v-if="show=='detail'">
+      <el-table v-loading="detailListLoading" :data="detailList" border fit highlight-current-row style="width: 100%">
 
+        <el-table-column type="index" width="60" align="center" label="序号">
+        </el-table-column>
 
+        <el-table-column width="240" align="center" label="订单号" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <span>{{ scope.row.ordernum }}</span>
+          </template>
+        </el-table-column>
 
+        <el-table-column width="150" align="center" label="活动名称" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <span>{{ scope.row.product.name }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column width="150" align="center" label="规格名称" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <span>{{ scope.row.unit.name }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column class-name="status-col" label="是否支付" width="110">
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.ispay==1?'success':'danger'">{{ scope.row.ispay==1?'已支付':'未支付' }}</el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column min-width="150" align="center" label="支付金额" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <span>￥{{ scope.row.unit.price/100 }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <pagination v-show="detailTotal>0" :total="detailTotal" :page.sync="detailListQuery.pagenum" :limit.sync="detailListQuery.pagesize" @pagination="morePage" />
+      <div class="btn-area">
+        <el-button size="small" @click="showView('list')" class="cancel-btn">返回</el-button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { fetchList, changeRatio } from '@/api/distributor'
+import { fetchList, changeRatio, distributeDetail } from '@/api/distributor'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import waves from '@/directive/waves'
 import elDragDialog from '@/directive/el-dragDialog'
@@ -117,6 +154,15 @@ export default {
         ratio: [
           {required: true, message: '请输入分销商提成比例', trigger: 'blur'}
         ]
+      },
+
+      detailList: [],
+      detailTotal: 0,
+      detailListLoading: true,
+      detailListQuery: {
+        pagenum: 1,
+        pagesize: 10,
+        openid: undefined
       }
     }
   },
@@ -174,6 +220,33 @@ export default {
     },
     handleDrag() {
       this.$refs.ratio.blur()
+    },
+    handleDetail(index, row) {
+      this.detailTotal = 0
+      this.detailList = []
+      this.showView('detail')
+      this.detailListLoading = true
+      this.detailListQuery.openid = row.openid
+      distributeDetail(this.detailListQuery).then(response => {
+        if(response.code==0){
+          this.detailList = response.data.list
+          this.detailTotal = response.data.total
+          this.detailListLoading = false
+        }
+      })
+    },
+    morePage() {
+      this.detailListLoading = true
+      distributeDetail(this.detailListQuery).then(response => {
+        if(response.code==0){
+          this.detailList = response.data.list
+          this.detailTotal = response.data.total
+          this.detailListLoading = false
+        }
+      })
+    },
+    showView(view) {
+      this.show = view
     }
   }
 }
@@ -183,9 +256,12 @@ export default {
 .edit-input {
   padding-right: 100px;
 }
-.cancel-btn {
+.btn-area {
   position: absolute;
-  right: 15px;
-  top: 10px;
+  right: 20px;
+}
+.cancel-btn {
+  position: relative;
+  right: 20px;
 }
 </style>
