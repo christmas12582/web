@@ -58,7 +58,7 @@
 
         <el-table-column min-width="250" label="操作">
           <template slot-scope="scope">
-            <el-button size="small" type="danger" @click="handleOffLinePay(scope.$index, scope.row)">已线下支付</el-button>
+            <el-button size="small" type="danger" @click="handleOffLinePay(scope.$index, scope.row)" v-if="scope.row.isexchange==0">已线下支付</el-button>
           </template>
         </el-table-column>
       </el-table>
