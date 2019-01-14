@@ -26,7 +26,7 @@
         <el-table-column type="index" width="60" align="center" label="序号">
         </el-table-column>
 
-        <el-table-column width="240" align="center" label="微信识别号" show-overflow-tooltip>
+        <el-table-column width="260" align="center" label="微信识别号" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ scope.row.openid }}</span>
           </template>

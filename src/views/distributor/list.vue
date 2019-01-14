@@ -22,6 +22,12 @@
           </template>
         </el-table-column>
 
+        <el-table-column width="150" align="center" label="姓名" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <span>{{ scope.row.name }}</span>
+          </template>
+        </el-table-column>
+
         <el-table-column width="150" align="center" label="电话号码" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>{{ scope.row.phone }}</span>
@@ -46,7 +52,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column min-width="300" label="操作">
+        <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button size="small" @click="handleDetail(scope.$index, scope.row)">查看分销明细</el-button>
           </template>
@@ -69,7 +75,7 @@
     </div>
     <div v-if="show=='detail'">
       <div class="filter-container text">
-        <span>分销商：</span><span>{{detailListQuery.openid}}</span><el-button size="small" @click="showView('list')" class="cancel-btn">返回</el-button>
+        <span>分销商：</span><span>{{detailListQuery.name}}</span><el-button size="small" @click="showView('list')" class="cancel-btn">返回</el-button>
       </div>
       <el-table v-loading="detailListLoading" :data="detailList" border fit highlight-current-row style="width: 100%">
 
@@ -163,7 +169,10 @@ export default {
       detailListQuery: {
         pagenum: 1,
         pagesize: 10,
-        openid: undefined
+        openid: undefined,
+        name: undefined,
+        phone: undefined,
+        address: undefined
       }
     }
   },
@@ -228,6 +237,9 @@ export default {
       this.showView('detail')
       this.detailListLoading = true
       this.detailListQuery.openid = row.openid
+      this.detailListQuery.name = row.name
+      this.detailListQuery.address = row.address
+      this.detailListQuery.phone = row.phone
       distributeDetail(this.detailListQuery).then(response => {
         if(response.code==0){
           this.detailList = response.data.list
