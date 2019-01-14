@@ -34,7 +34,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column class-name="status-col" label="是否有效" width="110">
+        <el-table-column class-name="status-col" label="是否有效" width="100">
           <template slot-scope="scope">
             <el-tag :type="scope.row.isvalid==1?'success':'danger'">{{ scope.row.isvalid==1?'有效':'无效' }}</el-tag>
           </template>
@@ -46,13 +46,13 @@
           </template>
         </el-table-column>
 
-        <el-table-column min-width="150" align="center" label="提成余额(元)" show-overflow-tooltip>
+        <el-table-column min-width="120" align="center" label="提成余额(元)" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>￥{{ scope.row.money/100 }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作">
+        <el-table-column min-width="150" label="操作">
           <template slot-scope="scope">
             <el-button size="small" @click="handleDetail(scope.$index, scope.row)">查看分销明细</el-button>
           </template>
